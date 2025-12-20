@@ -1,0 +1,16 @@
+services:
+  db:
+    container_name: gympulse-db
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: gympulse_db
+      POSTGRES_USER: alex
+      POSTGRES_PASSWORD: password
+    volumes:
+      - gympulse_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+volumes:
+  gympulse_data:
