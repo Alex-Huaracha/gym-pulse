@@ -1,0 +1,78 @@
+### GET request to example server
+GET http://localhost:8080/api/v1/members
+
+### Send POST request with json body
+POST http://localhost:8080/api/v1/members
+Content-Type: application/json
+
+{
+  "dni": "12345678",
+  "firstName": "Juan",
+  "lastName": "Perez",
+  "phone": "987654321"
+}
+
+### Send POST request with json body
+POST http://localhost:8080/api/v1/members
+Content-Type: application/json
+
+{
+  "dni": "12345679",
+  "firstName": "Gumball",
+  "lastName": "Watterson",
+  "phone": "987654321"
+}
+
+### 1. Get por ID (reemplaza el 1 por el ID que te dio el POST)
+GET http://localhost:8080/api/v1/members/1
+
+### 2. Update (Cambia el teléfono de Juan)
+PUT http://localhost:8080/api/v1/members/1
+Content-Type: application/json
+
+{
+  "dni": "12345678",
+  "firstName": "Juan",
+  "lastName": "Perez Actualizado",
+  "phone": "999666111"
+}
+
+### 3. Delete
+DELETE http://localhost:8080/api/v1/members/1
+
+
+### Create a new plan
+POST http://localhost:8080/api/v1/plans
+Content-Type: application/json
+
+{
+  "name": "Mensual Pro",
+  "durationDays": 30,
+  "price": 80.00
+}
+
+### Create another plan
+POST http://localhost:8080/api/v1/plans
+Content-Type: application/json
+
+{
+  "name": "Anual Premium",
+  "durationDays": 365,
+  "price": 800.00
+}
+
+### Get all plans
+GET http://localhost:8080/api/v1/plans
+
+### Get plan by ID (reemplaza el 1 por el ID que te dio el POST)
+GET http://localhost:8080/api/v1/plans/1
+
+### Update plan (Cambia el precio del plan)
+PUT http://localhost:8080/api/v1/plans/1
+Content-Type: application/json
+
+{
+  "name": "Mensual Pro",
+  "durationDays": 30,
+  "price": 75.00
+}
