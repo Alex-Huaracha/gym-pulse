@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 public class MembershipPlan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer Id;
+    private Integer id;
 
     @Column(nullable = false, length = 50)
     private String name;
