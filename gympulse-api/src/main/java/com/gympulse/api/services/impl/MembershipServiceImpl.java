@@ -31,20 +31,22 @@ public class MembershipServiceImpl implements MembershipService {
     @Transactional
     public MembershipResponseDTO createMembership(MembershipRequestDTO dto) {
         Member member = memberRepository.findById(dto.getMemberId())
-                .orElseThrow(() -> new RuntimeException("Socio no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Member not found"));
 
         MembershipPlan plan = planRepository.findById(dto.getPlanId())
-                .orElseThrow(() -> new RuntimeException("Plan no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Plan not found"));
 
         Membership membership = new Membership();
         membership.setMember(member);
         membership.setPlan(plan);
         membership.setStartDate(dto.getStartDate());
 
-        // Cálculo automático de fecha de fin
         LocalDate endDate = dto.getStartDate().plusDays(plan.getDurationDays());
         membership.setEndDate(endDate);
         membership.setIsPaid(true);
+
+        member.setStatus("ACTIVE");
+        memberRepository.save(member);
 
         return membershipMapper.toResponseDTO(membershipRepository.save(membership));
     }
@@ -54,7 +56,7 @@ public class MembershipServiceImpl implements MembershipService {
     public List<MembershipResponseDTO> getMemberHistory(Integer memberId) {
         // Validamos que el socio exista antes de buscar
         if (!memberRepository.existsById(memberId)) {
-            throw new RuntimeException("Socio no encontrado");
+            throw new RuntimeException("Member not found");
         }
 
         return membershipRepository.findByMemberId(memberId).stream()
@@ -67,14 +69,14 @@ public class MembershipServiceImpl implements MembershipService {
     public MembershipResponseDTO getMembershipById(Integer id) {
         return membershipRepository.findById(id)
                 .map(membershipMapper::toResponseDTO)
-                .orElseThrow(() -> new RuntimeException("Membresía no encontrada con ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Membership not found with ID: " + id));
     }
 
     @Override
     @Transactional
     public void deleteMembership(Integer id) {
         if (!membershipRepository.existsById(id)) {
-            throw new RuntimeException("No se puede eliminar. Membresía no encontrada.");
+            throw new RuntimeException("Cannot delete. Membership not found.");
         }
         membershipRepository.deleteById(id);
     }

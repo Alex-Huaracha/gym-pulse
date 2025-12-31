@@ -28,8 +28,6 @@ public class MemberServiceImpl implements MemberService {
 
         Member member = memberMapper.toEntity(requestDTO);
 
-        member.setStatus("ACTIVE");
-
         Member savedMember = memberRepository.save(member);
 
         return memberMapper.toResponseDTO(savedMember);
