@@ -33,7 +33,9 @@ public class CheckIn {
 
     @PrePersist
     protected void onCreate() {
-        this.checkInTime = OffsetDateTime.now();
+        if (this.checkInTime == null) {
+            this.checkInTime = OffsetDateTime.now();
+        }
     }
 
     @Override
