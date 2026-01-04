@@ -1,5 +1,6 @@
 package com.gympulse.api.controllers;
 
+import com.gympulse.api.dtos.DashboardStatsDTO;
 import com.gympulse.api.dtos.MemberSummaryDTO;
 import com.gympulse.api.services.DashboardService;
 import lombok.RequiredArgsConstructor;
@@ -19,5 +20,10 @@ public class DashboardController {
     @GetMapping("/members-summary")
     public ResponseEntity<List<MemberSummaryDTO>> getMembersSummary() {
         return ResponseEntity.ok(dashboardService.getMembersSummary());
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<DashboardStatsDTO> getDashboardStats() {
+        return ResponseEntity.ok(dashboardService.getStats());
     }
 }

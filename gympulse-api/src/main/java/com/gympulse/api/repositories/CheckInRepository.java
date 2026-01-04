@@ -11,4 +11,6 @@ import java.util.List;
 
 @Repository
 public interface CheckInRepository extends JpaRepository<CheckIn, Integer> {
+    @Query("SELECT COUNT(c) FROM CheckIn c WHERE c.checkInTime >= CURRENT_DATE")
+    Long countCheckInsToday();
 }

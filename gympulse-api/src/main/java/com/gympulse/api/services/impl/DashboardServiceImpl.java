@@ -1,8 +1,10 @@
 package com.gympulse.api.services.impl;
 
+import com.gympulse.api.dtos.DashboardStatsDTO;
 import com.gympulse.api.dtos.MemberSummaryDTO;
 import com.gympulse.api.models.Member;
 import com.gympulse.api.models.Membership;
+import com.gympulse.api.repositories.CheckInRepository;
 import com.gympulse.api.repositories.MemberRepository;
 import com.gympulse.api.repositories.MembershipRepository;
 import com.gympulse.api.services.DashboardService;
@@ -11,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -23,6 +26,7 @@ import java.util.stream.Collectors;
 public class DashboardServiceImpl implements DashboardService {
     private final MemberRepository memberRepository;
     private final MembershipRepository membershipRepository;
+    private final CheckInRepository checkInRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -61,4 +65,20 @@ public class DashboardServiceImpl implements DashboardService {
 
         return summaryList;
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public DashboardStatsDTO getStats() {
+        Long activeMembers = memberRepository.countActiveMembers();
+        Long checkInsToday = checkInRepository.countCheckInsToday();
+        BigDecimal revenue = membershipRepository.sumMonthlyRevenue();
+
+        return DashboardStatsDTO.builder()
+                .totalActiveMembers(activeMembers)
+                .checkInsToday(checkInsToday)
+                .monthlyRevenue(revenue)
+                .build();
+    }
+
+
 }
