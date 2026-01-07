@@ -6,9 +6,9 @@ POST http://localhost:8080/api/v1/members
 Content-Type: application/json
 
 {
-  "dni": "12345678",
-  "firstName": "Juan",
-  "lastName": "Perez",
+  "dni": "00001111",
+  "firstName": "Alex",
+  "lastName": "Huaracha",
   "phone": "987654321"
 }
 
@@ -17,7 +17,7 @@ POST http://localhost:8080/api/v1/members
 Content-Type: application/json
 
 {
-  "dni": "12345679",
+  "dni": "11112222",
   "firstName": "Gumball",
   "lastName": "Watterson",
   "phone": "987654321"
@@ -76,3 +76,70 @@ Content-Type: application/json
   "durationDays": 30,
   "price": 75.00
 }
+
+### Asegúrate de que existan el memberId: 1 y el planId: 1
+POST http://localhost:8080/api/v1/memberships
+Content-Type: application/json
+
+{
+"memberId": 2,
+"planId": 1,
+"startDate": "2025-12-23"
+}
+
+### 2. Ver Historial de Membresías de un Socio
+# Esto te devolverá la lista de todas las veces que el socio 1 se ha inscrito
+GET http://localhost:8080/api/v1/memberships/member/2
+
+### 3. Obtener una Membresía específica por su ID
+# Útil para ver el detalle de una suscripción concreta (ID devuelto en el paso 1)
+GET http://localhost:8080/api/v1/memberships/1
+
+### 4. Eliminar una Membresía (Solo para corrección de errores)
+# Borra la membresía ID 1. Debería devolver 204 No Content.
+DELETE http://localhost:8080/api/v1/memberships/1
+
+
+### ==========================================
+### PRUEBAS DEL MÓDULO DE CHECK-IN
+### ==========================================
+
+### Escenario A: Socio con Membresía Activa
+# Busca un socio que tenga un plan vigente (que no haya vencido)
+POST http://localhost:8080/api/v1/check-ins
+Content-Type: application/json
+
+{
+  "dni": "37359837"
+}
+
+### Escenario B: Socio con Membresía Vencida
+# Si cambiaste la fecha en la BD a una pasada, aquí debería dar accessGranted: false
+POST http://localhost:8080/api/v1/check-ins
+Content-Type: application/json
+
+{
+  "dni": "00001111"
+}
+
+### Escenario C: DNI que no existe
+POST http://localhost:8080/api/v1/check-ins
+Content-Type: application/json
+
+{
+  "dni": "00000000"
+}
+
+### ==========================================
+### MÓDULO DASHBOARD (ANALÍTICAS)
+### ==========================================
+
+### 1. Obtener Resumen de Socios (Tabla Principal)
+GET http://localhost:8080/api/v1/dashboard/members-summary
+
+### 2. Obtener KPIs (Tarjetas Superiores)
+GET http://localhost:8080/api/v1/dashboard/stats
+
+
+### 3. Obtener Datos para Gráficos (Hourly & Weekly)
+GET http://localhost:8080/api/v1/dashboard/charts
