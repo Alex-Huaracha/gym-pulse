@@ -1,1 +1,23 @@
 @import 'tailwindcss';
+
+:root {
+  --bg-app: #131314;
+
+  --bg-card: #1e1f20;
+  --bg-card-hover: #2d2e2f;
+
+  --border-color: #444746;
+
+  --text-primary: #e3e3e3;
+  --text-secondary: #c4c7c5;
+  --text-muted: #8e918f;
+
+  --accent: #ffffff;
+}
+
+body {
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-family: 'Roboto', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}

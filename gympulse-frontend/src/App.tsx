@@ -1,8 +1,14 @@
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import DashboardPage from './pages/dashboard-page';
+
 function App() {
   return (
-    <>
-      <h1 className="text-3xl font-bold underline">Hello world!</h1>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
