@@ -10,13 +10,13 @@ import {
 } from 'lucide-react';
 import { dashboardService } from '../services/dashboard-service';
 import type { DashboardStats } from '../types';
+import { AnalyticsWidget } from '../components/dashboard/analytics-widget';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Función para cargar datos
     const fetchData = async () => {
       try {
         const data = await dashboardService.getStats();
@@ -47,7 +47,7 @@ export default function DashboardPage() {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[160px]">
-        {/* KPI 1: Socios Activos */}
+        {/* KPI 1: Active Members */}
         <Card title="Socios Activos" className="lg:col-span-1">
           <div className="flex flex-col justify-end h-full pb-2">
             <div className="text-5xl font-medium text-white">
@@ -60,7 +60,7 @@ export default function DashboardPage() {
           </div>
         </Card>
 
-        {/* KPI 2: Check-ins Hoy */}
+        {/* KPI 2: Check-ins Today */}
         <Card title="Check-ins Hoy" className="lg:col-span-1">
           <div className="flex flex-col justify-end h-full pb-2">
             <div className="text-5xl font-medium text-white">
@@ -72,7 +72,7 @@ export default function DashboardPage() {
           </div>
         </Card>
 
-        {/* KPI 3: Ingresos */}
+        {/* KPI 3: Monthly Revenue */}
         <Card title="Ingresos Mes" className="lg:col-span-1">
           <div className="flex flex-col justify-end h-full pb-2">
             <div className="text-5xl font-medium text-white">
@@ -85,7 +85,7 @@ export default function DashboardPage() {
           </div>
         </Card>
 
-        {/* Bloque de Acciones (Estático por ahora) */}
+        {/* Quick Actions */}
         <Card title="Acciones" className="lg:col-span-1 lg:row-span-2">
           <div className="flex flex-col gap-3 h-full justify-center">
             <button className="flex items-center justify-center gap-2 p-4 bg-[#E3E3E3] text-black rounded-xl hover:bg-white transition-colors font-medium cursor-pointer">
@@ -103,12 +103,13 @@ export default function DashboardPage() {
           </div>
         </Card>
 
-        {/* Placeholder para Gráfico */}
-        <Card title="Tendencias" className="lg:col-span-3 lg:row-span-2">
-          <div className="flex items-center justify-center h-full border border-dashed border-[#444746] rounded-lg">
-            <span className="text-[#8E918F]">
-              Gráfico de Afluencia (Pendiente de implementación)
-            </span>
+        {/* Analytics Widget */}
+        <Card
+          title="Afluencia & Tendencias"
+          className="lg:col-span-3 lg:row-span-2"
+        >
+          <div className="h-full w-full pt-2">
+            <AnalyticsWidget />
           </div>
         </Card>
       </div>
