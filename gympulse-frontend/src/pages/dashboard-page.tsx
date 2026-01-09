@@ -6,6 +6,7 @@ import type { DashboardStats } from '../types';
 import { AnalyticsWidget } from '../components/dashboard/analytics-widget';
 import { AlertsWidget } from '../components/dashboard/alerts-widget';
 import { LiveFeedWidget } from '../components/dashboard/live-feed-widget';
+import { MembersTableWidget } from '../components/dashboard/members-table-widget';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -109,6 +110,12 @@ export default function DashboardPage() {
               <AnalyticsWidget />
             </div>
           </Card>
+        </div>
+      </div>
+      {/* Members Table */}{' '}
+      <div className="min-h-screen p-6 bg-[#131314] border-t border-[#1E1F20]">
+        <div className="h-full">
+          <MembersTableWidget />
         </div>
       </div>
     </div>
