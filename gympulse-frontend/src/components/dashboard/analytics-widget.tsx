@@ -30,11 +30,12 @@ export function AnalyticsWidget() {
   if (!data)
     return <div className="text-sm text-red-400">Error al cargar datos</div>;
 
-  // Hourly Data (Fill 24h to ensure order)
-  const hourlyData = Array.from({ length: 24 }, (_, i) => {
-    const hourKey = i.toString();
+  // Hourly Data
+  const hourlyData = Array.from({ length: 18 }, (_, i) => {
+    const hour = i + 5; // Start at 5 AM
+    const hourKey = hour.toString();
     return {
-      name: `${i}:00`,
+      name: `${hour}:00`,
       value: data.hourlyInflow[hourKey] || 0, // If no data, default to 0
     };
   });
