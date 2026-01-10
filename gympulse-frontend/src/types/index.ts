@@ -16,5 +16,5 @@ export interface MemberSummary {
   status: 'ACTIVE' | 'INACTIVE';
   currentPlan: string | null;
   endDate: string | null;
-  daysRemaining: number;
+  daysRemaining: string;
 }

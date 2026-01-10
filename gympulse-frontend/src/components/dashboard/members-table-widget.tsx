@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Search, Plus, MoreHorizontal, User } from 'lucide-react';
+import {
+  Search,
+  Plus,
+  MoreHorizontal,
+  User,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import { dashboardService } from '../../services/dashboard-service';
 import type { MemberSummary } from '../../types';
 
@@ -8,11 +15,15 @@ export function MembersTableWidget() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 7;
+
   useEffect(() => {
     const fetchMembers = async () => {
       try {
         const data = await dashboardService.getMembersSummary();
-        setMembers(data);
+        const sortedData = data.sort((a, b) => b.id - a.id);
+        setMembers(sortedData);
       } catch (error) {
         console.error('Error cargando socios:', error);
       } finally {
@@ -22,11 +33,24 @@ export function MembersTableWidget() {
     fetchMembers();
   }, []);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
   const filteredMembers = members.filter(
     (m) =>
       m.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       m.dni.includes(searchTerm)
   );
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredMembers.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredMembers.length / itemsPerPage);
+
+  const nextPage = () =>
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  const prevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
 
   return (
     <div className="flex flex-col h-full p-4">
@@ -57,93 +81,140 @@ export function MembersTableWidget() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto rounded-xl border border-[#444746] bg-[#1E1F20] scrollbar-thin">
-        <table className="w-full text-left border-collapse">
-          <thead className="bg-[#2D2E2F] text-[#8E918F] text-xs uppercase sticky top-0 z-10">
-            <tr>
-              <th className="p-4 font-medium">Socio</th>
-              <th className="p-4 font-medium">DNI</th>
-              <th className="p-4 font-medium">Plan Actual</th>
-              <th className="p-4 font-medium">Vence</th>
-              <th className="p-4 font-medium">Días Restantes</th>
-              <th className="p-4 font-medium">Estado</th>
-              <th className="p-4 font-medium text-right">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#444746]">
-            {loading ? (
+      <div className="flex-1 flex flex-col overflow-hidden rounded-xl border border-[#444746] bg-[#1E1F20]">
+        <div className="flex-1 overflow-auto scrollbar-thin">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-[#2D2E2F] text-[#8E918F] text-xs uppercase sticky top-0 z-10 shadow-sm">
               <tr>
-                <td colSpan={5} className="p-8 text-center text-[#8E918F]">
-                  Cargando lista de socios...
-                </td>
+                <th className="p-4 font-medium">Socio</th>
+                <th className="p-4 font-medium">DNI</th>
+                <th className="p-4 font-medium">Plan Actual</th>
+                <th className="p-4 font-medium">Vence</th>
+                <th className="p-4 font-medium">Días Rest.</th>
+                <th className="p-4 font-medium">Estado</th>
+                <th className="p-4 font-medium text-right">Acciones</th>
               </tr>
-            ) : filteredMembers.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="p-8 text-center text-[#8E918F]">
-                  No se encontraron socios.
-                </td>
-              </tr>
-            ) : (
-              filteredMembers.map((member) => (
-                <tr
-                  key={member.id}
-                  className="hover:bg-[#2D2E2F]/50 transition-colors group"
-                >
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-[#2D2E2F] flex items-center justify-center border border-[#444746]">
-                        <User size={14} className="text-[#8E918F]" />
-                      </div>
-                      <span className="text-[#E3E3E3] font-medium">
-                        {member.fullName}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="p-4 text-[#C4C7C5] font-mono text-sm">
-                    {member.dni}
-                  </td>
-                  <td className="p-4">
-                    <div className="flex flex-col">
-                      <span className="text-[#E3E3E3] text-sm">
-                        {member.currentPlan}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex flex-col">
-                      <span className="text-[#C4C7C5] font-mono text-sm">
-                        {member.endDate ? member.endDate : '-'}{' '}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex flex-col">
-                      <span className="text-[#C4C7C5] font-mono text-sm">
-                        {member.daysRemaining ? member.daysRemaining : '-'}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                        member.status === 'ACTIVE'
-                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                          : 'bg-red-500/10 text-red-400 border-red-500/20'
-                      }`}
-                    >
-                      {member.status === 'ACTIVE' ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </td>
-                  <td className="p-4 text-right">
-                    <button className="text-[#8E918F] hover:text-white p-2 rounded-lg hover:bg-[#444746] transition-colors cursor-pointer">
-                      <MoreHorizontal size={18} />
-                    </button>
+            </thead>
+            <tbody className="divide-y divide-[#444746]">
+              {loading ? (
+                <tr>
+                  <td colSpan={7} className="p-8 text-center text-[#8E918F]">
+                    Cargando lista de socios...
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : currentItems.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="p-8 text-center text-[#8E918F]">
+                    {searchTerm
+                      ? 'No se encontraron resultados'
+                      : 'No hay socios registrados'}
+                  </td>
+                </tr>
+              ) : (
+                currentItems.map((member) => (
+                  <tr
+                    key={member.id}
+                    className="hover:bg-[#2D2E2F]/50 transition-colors group"
+                  >
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[#2D2E2F] flex items-center justify-center border border-[#444746]">
+                          <User size={14} className="text-[#8E918F]" />
+                        </div>
+                        <span className="text-[#E3E3E3] font-medium">
+                          {member.fullName}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="p-4 text-[#C4C7C5] font-mono text-sm">
+                      {member.dni}
+                    </td>
+                    <td className="p-4">
+                      <span className="text-[#E3E3E3] text-sm block min-w-25">
+                        {member.currentPlan}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <span className="text-[#C4C7C5] font-mono text-sm">
+                        {member.endDate ? member.endDate : '-'}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <span
+                        className={`font-mono text-sm ${
+                          member.daysRemaining !== null &&
+                          parseInt(member.daysRemaining) < 3
+                            ? 'text-red-400 font-bold'
+                            : 'text-[#C4C7C5]'
+                        }`}
+                      >
+                        {member.daysRemaining !== null
+                          ? member.daysRemaining
+                          : '-'}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+                          member.status === 'ACTIVE'
+                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                            : 'bg-red-500/10 text-red-400 border-red-500/20'
+                        }`}
+                      >
+                        {member.status === 'ACTIVE' ? 'Activo' : 'Inactivo'}
+                      </span>
+                    </td>
+                    <td className="p-4 text-right">
+                      <button className="text-[#8E918F] hover:text-white p-2 rounded-lg hover:bg-[#444746] transition-colors cursor-pointer">
+                        <MoreHorizontal size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination*/}
+        {!loading && filteredMembers.length > 0 && (
+          <div className="flex items-center justify-between px-4 py-3 bg-[#1E1F20] border-t border-[#444746]">
+            <div className="text-xs text-[#8E918F]">
+              Mostrando{' '}
+              <span className="text-[#E3E3E3] font-medium">
+                {indexOfFirstItem + 1}
+              </span>{' '}
+              -{' '}
+              <span className="text-[#E3E3E3] font-medium">
+                {Math.min(indexOfLastItem, filteredMembers.length)}
+              </span>{' '}
+              de{' '}
+              <span className="text-[#E3E3E3] font-medium">
+                {filteredMembers.length}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={prevPage}
+                disabled={currentPage === 1}
+                className="p-1 rounded hover:bg-[#2D2E2F] disabled:opacity-30 disabled:hover:bg-transparent text-[#E3E3E3] transition-colors"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <span className="text-xs text-[#8E918F] font-mono">
+                {currentPage} / {totalPages}
+              </span>
+              <button
+                onClick={nextPage}
+                disabled={currentPage === totalPages}
+                className="p-1 rounded hover:bg-[#2D2E2F] disabled:opacity-30 disabled:hover:bg-transparent text-[#E3E3E3] transition-colors"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
