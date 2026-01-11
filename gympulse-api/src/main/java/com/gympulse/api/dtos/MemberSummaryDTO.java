@@ -18,5 +18,5 @@ public class MemberSummaryDTO {
     private String status;
     private String currentPlan;
     private LocalDate endDate;
-    private String daysRemaining;
+    private Long daysRemaining;
 }
