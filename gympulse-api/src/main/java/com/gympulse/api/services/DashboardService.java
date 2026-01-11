@@ -10,4 +10,5 @@ public interface DashboardService {
     List<MemberSummaryDTO> getMembersSummary();
     DashboardStatsDTO getStats();
     DashboardChartsDTO getChartsData();
+    List<MemberSummaryDTO> getMembershipAlerts();
 }

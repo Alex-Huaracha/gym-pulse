@@ -32,4 +32,10 @@ public class DashboardController {
     public ResponseEntity<DashboardChartsDTO> getDashboardCharts() {
         return ResponseEntity.ok(dashboardService.getChartsData());
     }
+
+    @GetMapping("/alerts")
+    public ResponseEntity<List<MemberSummaryDTO>> getMembershipAlerts() {
+        List<MemberSummaryDTO> alerts = dashboardService.getMembershipAlerts();
+        return ResponseEntity.ok(alerts);
+    }
 }

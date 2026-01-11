@@ -10,7 +10,6 @@ import com.gympulse.api.repositories.MemberRepository;
 import com.gympulse.api.repositories.MembershipRepository;
 import com.gympulse.api.services.DashboardService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -101,6 +100,15 @@ public class DashboardServiceImpl implements DashboardService {
                 .hourlyInflow(getHourlyStats())
                 .weeklyInflow(getWeeklyStats())
                 .build();
+    }
+
+    @Override
+    public List<MemberSummaryDTO> getMembershipAlerts() {
+        List<MemberSummaryDTO> allMembers = this.getMembersSummary();
+        return allMembers.stream()
+                .filter(m -> m.getDaysRemaining() != null && m.getDaysRemaining() <= 5)
+                .limit(5)
+                .collect(Collectors.toList());
     }
 
     private Map<Integer, Long> getHourlyStats() {
