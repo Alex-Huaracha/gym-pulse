@@ -34,7 +34,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Transactional(readOnly = true)
     public List<MemberSummaryDTO> getMembersSummary() {
-        List<Member> allMembers = memberRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+        List<Member> allMembers = memberRepository.findAll();
         List<Membership> activeMemberships = membershipRepository.findAllActiveMemberships();
 
         Map<Integer, Membership> membershipMap = activeMemberships.stream()
@@ -56,15 +56,26 @@ public class DashboardServiceImpl implements DashboardService {
                 dto.setEndDate(activeMembership.getEndDate());
 
                 long days = ChronoUnit.DAYS.between(LocalDate.now(), activeMembership.getEndDate());
-                dto.setDaysRemaining(days + " days");
+                dto.setDaysRemaining(days);
             } else {
-                dto.setCurrentPlan("No Active Plan");
+                dto.setCurrentPlan("Sin Plan Activo");
                 dto.setEndDate(null);
-                dto.setDaysRemaining("-");
+                dto.setDaysRemaining(null);
             }
-
             summaryList.add(dto);
         }
+
+        summaryList.sort((m1, m2) -> {
+            Long d1 = m1.getDaysRemaining();
+            Long d2 = m2.getDaysRemaining();
+
+            if (d1 == null && d2 == null) return m1.getFullName().compareTo(m2.getFullName());
+            if (d1 == null) return 1;
+            if (d2 == null) return -1;
+
+            int comparison = Long.compare(d1, d2);
+            return comparison != 0 ? comparison : m1.getFullName().compareTo(m2.getFullName());
+        });
 
         return summaryList;
     }
