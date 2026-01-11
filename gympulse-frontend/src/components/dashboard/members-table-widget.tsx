@@ -22,8 +22,7 @@ export function MembersTableWidget() {
     const fetchMembers = async () => {
       try {
         const data = await dashboardService.getMembersSummary();
-        const sortedData = data.sort((a, b) => b.id - a.id);
-        setMembers(sortedData);
+        setMembers(data);
       } catch (error) {
         console.error('Error cargando socios:', error);
       } finally {
@@ -143,7 +142,7 @@ export function MembersTableWidget() {
                       <span
                         className={`font-mono text-sm ${
                           member.daysRemaining !== null &&
-                          parseInt(member.daysRemaining) < 3
+                          member.daysRemaining < 3
                             ? 'text-red-400 font-bold'
                             : 'text-[#C4C7C5]'
                         }`}
