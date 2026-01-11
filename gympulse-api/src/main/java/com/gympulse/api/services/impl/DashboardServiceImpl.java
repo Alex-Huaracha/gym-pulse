@@ -17,7 +17,6 @@ import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,50 +32,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Transactional(readOnly = true)
     public List<MemberSummaryDTO> getMembersSummary() {
-        List<Member> allMembers = memberRepository.findAll();
-        List<Membership> activeMemberships = membershipRepository.findAllActiveMemberships();
-
-        Map<Integer, Membership> membershipMap = activeMemberships.stream()
-                .collect(Collectors.toMap(m -> m.getMember().getId(), m -> m));
-
-        List<MemberSummaryDTO> summaryList = new ArrayList<>();
-
-        for (Member member : allMembers) {
-            Membership activeMembership = membershipMap.get(member.getId());
-
-            MemberSummaryDTO dto = new MemberSummaryDTO();
-            dto.setId(member.getId());
-            dto.setFullName(member.getFirstName() + " " + member.getLastName());
-            dto.setDni(member.getDni());
-            dto.setStatus(member.getStatus());
-
-            if (activeMembership != null) {
-                dto.setCurrentPlan(activeMembership.getPlan().getName());
-                dto.setEndDate(activeMembership.getEndDate());
-
-                long days = ChronoUnit.DAYS.between(LocalDate.now(), activeMembership.getEndDate());
-                dto.setDaysRemaining(days);
-            } else {
-                dto.setCurrentPlan("Sin Plan Activo");
-                dto.setEndDate(null);
-                dto.setDaysRemaining(null);
-            }
-            summaryList.add(dto);
-        }
-
-        summaryList.sort((m1, m2) -> {
-            Long d1 = m1.getDaysRemaining();
-            Long d2 = m2.getDaysRemaining();
-
-            if (d1 == null && d2 == null) return m1.getFullName().compareTo(m2.getFullName());
-            if (d1 == null) return 1;
-            if (d2 == null) return -1;
-
-            int comparison = Long.compare(d1, d2);
-            return comparison != 0 ? comparison : m1.getFullName().compareTo(m2.getFullName());
-        });
-
-        return summaryList;
+        return fetchAndCalculateMemberSummaries();
     }
 
     @Override
@@ -103,12 +59,58 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MemberSummaryDTO> getMembershipAlerts() {
-        List<MemberSummaryDTO> allMembers = this.getMembersSummary();
+        List<MemberSummaryDTO> allMembers = fetchAndCalculateMemberSummaries();
         return allMembers.stream()
                 .filter(m -> m.getDaysRemaining() != null && m.getDaysRemaining() <= 5)
                 .limit(5)
                 .collect(Collectors.toList());
+    }
+
+    private List<MemberSummaryDTO> fetchAndCalculateMemberSummaries() {
+        List<Member> allMembers = memberRepository.findAll();
+        List<Membership> activeMemberships = membershipRepository.findAllActiveMemberships();
+
+        Map<Integer, Membership> membershipMap = activeMemberships.stream()
+                .collect(Collectors.toMap(m -> m.getMember().getId(), m -> m));
+
+        return allMembers.stream().map(member -> {
+                    Membership activeMembership = membershipMap.get(member.getId());
+
+                    String planName = "Sin Plan Activo";
+                    LocalDate endDate = null;
+                    Long daysRemaining = null;
+
+                    if (activeMembership != null) {
+                        planName = activeMembership.getPlan().getName();
+                        endDate = activeMembership.getEndDate();
+                        // Calculate days remaining
+                        daysRemaining = ChronoUnit.DAYS.between(LocalDate.now(), endDate);
+                    }
+
+                    return MemberSummaryDTO.builder()
+                            .id(member.getId())
+                            .fullName(member.getFirstName() + " " + member.getLastName())
+                            .dni(member.getDni())
+                            .status(member.getStatus())
+                            .currentPlan(planName)
+                            .endDate(endDate)
+                            .daysRemaining(daysRemaining)
+                            .build();
+                })
+                // Sort by days remaining, then by full name
+                .sorted((m1, m2) -> {
+                    Long d1 = m1.getDaysRemaining();
+                    Long d2 = m2.getDaysRemaining();
+
+                    if (d1 == null && d2 == null) return m1.getFullName().compareTo(m2.getFullName());
+                    if (d1 == null) return 1;
+                    if (d2 == null) return -1;
+
+                    int comparison = Long.compare(d1, d2);
+                    return comparison != 0 ? comparison : m1.getFullName().compareTo(m2.getFullName());
+                }).collect(Collectors.toList());
     }
 
     private Map<Integer, Long> getHourlyStats() {
