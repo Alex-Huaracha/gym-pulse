@@ -1,5 +1,10 @@
 import api from './api';
-import type { DashboardStats, DashboardCharts, MemberSummary } from '../types';
+import type {
+  DashboardStats,
+  DashboardCharts,
+  MemberSummary,
+  CheckInSummary,
+} from '../types';
 
 export const dashboardService = {
   getStats: async (): Promise<DashboardStats> => {
@@ -21,6 +26,13 @@ export const dashboardService = {
 
   getAlerts: async (): Promise<MemberSummary[]> => {
     const { data } = await api.get<MemberSummary[]>('/dashboard/alerts');
+    return data;
+  },
+
+  getRecentCheckIns: async (): Promise<CheckInSummary[]> => {
+    const { data } = await api.get<CheckInSummary[]>(
+      '/dashboard/recent-check-ins'
+    );
     return data;
   },
 };

@@ -18,3 +18,9 @@ export interface MemberSummary {
   endDate: string | null;
   daysRemaining: number | null;
 }
+
+export interface CheckInSummary {
+  id: number;
+  memberName: string;
+  checkInTime: string;
+}
