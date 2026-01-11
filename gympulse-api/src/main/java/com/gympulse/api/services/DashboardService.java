@@ -1,5 +1,6 @@
 package com.gympulse.api.services;
 
+import com.gympulse.api.dtos.CheckInSummaryDTO;
 import com.gympulse.api.dtos.DashboardChartsDTO;
 import com.gympulse.api.dtos.DashboardStatsDTO;
 import com.gympulse.api.dtos.MemberSummaryDTO;
@@ -11,4 +12,5 @@ public interface DashboardService {
     DashboardStatsDTO getStats();
     DashboardChartsDTO getChartsData();
     List<MemberSummaryDTO> getMembershipAlerts();
+    List<CheckInSummaryDTO> getRecentCheckIns();
 }

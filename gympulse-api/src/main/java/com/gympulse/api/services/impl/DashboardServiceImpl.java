@@ -1,5 +1,6 @@
 package com.gympulse.api.services.impl;
 
+import com.gympulse.api.dtos.CheckInSummaryDTO;
 import com.gympulse.api.dtos.DashboardChartsDTO;
 import com.gympulse.api.dtos.DashboardStatsDTO;
 import com.gympulse.api.dtos.MemberSummaryDTO;
@@ -10,6 +11,9 @@ import com.gympulse.api.repositories.MemberRepository;
 import com.gympulse.api.repositories.MembershipRepository;
 import com.gympulse.api.services.DashboardService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,6 +69,22 @@ public class DashboardServiceImpl implements DashboardService {
         return allMembers.stream()
                 .filter(m -> m.getDaysRemaining() != null && m.getDaysRemaining() <= 5)
                 .limit(5)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CheckInSummaryDTO> getRecentCheckIns() {
+        Pageable topSeven = PageRequest.of(0, 7, Sort.by("checkInTime").descending());
+
+        return checkInRepository.findAll(topSeven).stream()
+                .map(checkIn -> CheckInSummaryDTO.builder()
+                        .id(checkIn.getId())
+                        .memberName(checkIn.getMember().getFirstName() + " " + checkIn.getMember().getLastName())
+                        .checkInTime(checkIn.getCheckInTime()
+                                .atZoneSameInstant(java.time.ZoneId.systemDefault())
+                                .toLocalDateTime())
+
+                        .build())
                 .collect(Collectors.toList());
     }
 

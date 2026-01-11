@@ -1,5 +1,6 @@
 package com.gympulse.api.controllers;
 
+import com.gympulse.api.dtos.CheckInSummaryDTO;
 import com.gympulse.api.dtos.DashboardChartsDTO;
 import com.gympulse.api.dtos.DashboardStatsDTO;
 import com.gympulse.api.dtos.MemberSummaryDTO;
@@ -37,5 +38,11 @@ public class DashboardController {
     public ResponseEntity<List<MemberSummaryDTO>> getMembershipAlerts() {
         List<MemberSummaryDTO> alerts = dashboardService.getMembershipAlerts();
         return ResponseEntity.ok(alerts);
+    }
+
+    @GetMapping("/recent-check-ins")
+    public ResponseEntity<List<CheckInSummaryDTO>> getRecentCheckIns() {
+        List<CheckInSummaryDTO> recentCheckIns = dashboardService.getRecentCheckIns();
+        return ResponseEntity.ok(recentCheckIns);
     }
 }
