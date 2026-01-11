@@ -148,7 +148,7 @@ export function MembersTableWidget() {
                         }`}
                       >
                         {member.daysRemaining !== null
-                          ? member.daysRemaining
+                          ? member.daysRemaining + ' días'
                           : '-'}
                       </span>
                     </td>

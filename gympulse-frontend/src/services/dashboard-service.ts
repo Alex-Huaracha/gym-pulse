@@ -18,4 +18,9 @@ export const dashboardService = {
     );
     return data;
   },
+
+  getAlerts: async (): Promise<MemberSummary[]> => {
+    const { data } = await api.get<MemberSummary[]>('/dashboard/alerts');
+    return data;
+  },
 };
