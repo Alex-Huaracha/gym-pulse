@@ -1,10 +1,12 @@
 package com.gympulse.api.repositories;
 
 import com.gympulse.api.models.CheckIn;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Repository
@@ -25,4 +27,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Integer> {
             "GROUP BY EXTRACT(ISODOW FROM c.check_in_time)",
             nativeQuery = true)
     List<Object[]> countCheckInsByDayOfWeek();
+
+    // Obtain a paginated list of check-ins after a specific time
+    List<CheckIn> findByCheckInTimeAfter(OffsetDateTime time, Pageable pageable);
 }

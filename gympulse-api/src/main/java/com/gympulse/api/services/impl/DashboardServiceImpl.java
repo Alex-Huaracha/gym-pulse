@@ -18,8 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -73,17 +72,19 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CheckInSummaryDTO> getRecentCheckIns() {
+        ZonedDateTime startOfDay = LocalDate.now().atStartOfDay(ZoneId.systemDefault());
+        OffsetDateTime threshold = startOfDay.toOffsetDateTime();
         Pageable topSeven = PageRequest.of(0, 7, Sort.by("checkInTime").descending());
 
-        return checkInRepository.findAll(topSeven).stream()
+        return checkInRepository.findByCheckInTimeAfter(threshold, topSeven).stream()
                 .map(checkIn -> CheckInSummaryDTO.builder()
                         .id(checkIn.getId())
                         .memberName(checkIn.getMember().getFirstName() + " " + checkIn.getMember().getLastName())
                         .checkInTime(checkIn.getCheckInTime()
-                                .atZoneSameInstant(java.time.ZoneId.systemDefault())
+                                .atZoneSameInstant(ZoneId.systemDefault())
                                 .toLocalDateTime())
-
                         .build())
                 .collect(Collectors.toList());
     }
