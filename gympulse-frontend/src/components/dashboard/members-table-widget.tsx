@@ -6,14 +6,17 @@ import {
   User,
   ChevronLeft,
   ChevronRight,
+  Settings,
 } from 'lucide-react';
 import { dashboardService } from '../../services/dashboard-service';
 import type { MemberSummary } from '../../types';
+import { PlansManagerModal } from '../plans/plans-manager-modal';
 
 export function MembersTableWidget() {
   const [members, setMembers] = useState<MemberSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isPlansModalOpen, setIsPlansModalOpen] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 7;
@@ -72,6 +75,14 @@ export function MembersTableWidget() {
               className="bg-[#2D2E2F] border border-[#444746] text-[#E3E3E3] text-sm rounded-lg pl-9 pr-4 py-2 focus:outline-none focus:border-[#E3E3E3] w-64 transition-colors placeholder:text-[#8E918F]"
             />
           </div>
+
+          <button
+            onClick={() => setIsPlansModalOpen(true)}
+            className="flex items-center gap-2 bg-[#2D2E2F] hover:bg-[#444746] border border-[#444746] text-[#E3E3E3] text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+          >
+            <Settings size={16} />
+            Planes
+          </button>
 
           <button className="flex items-center gap-2 bg-[#E3E3E3] hover:bg-white text-black text-sm font-medium px-4 py-2 rounded-lg transition-colors cursor-pointer">
             <Plus size={16} />
@@ -215,6 +226,11 @@ export function MembersTableWidget() {
           </div>
         )}
       </div>
+
+      <PlansManagerModal
+        isOpen={isPlansModalOpen}
+        onClose={() => setIsPlansModalOpen(false)}
+      />
     </div>
   );
 }

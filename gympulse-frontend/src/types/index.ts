@@ -24,3 +24,10 @@ export interface CheckInSummary {
   memberName: string;
   checkInTime: string;
 }
+
+export interface MembershipPlan {
+  id?: number;
+  name: string;
+  durationDays: number;
+  price: number;
+}
